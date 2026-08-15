@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA & Crypto Architecture Quest Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="logo-container">
+                <div class="logo-icon">⚔</div>
+                <h1 class="glitch" data-text="QUEST HUB">QUEST HUB</h1>
+            </div>
+            <p class="tagline">Master the Arcane Arts of <span class="highlight">Data Structures</span> & <span class="highlight-crypto">Cryptographic Architecture</span></p>
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-value">12</span>
+                    <span class="stat-label">Quest Lines</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">∞</span>
+                    <span class="stat-label">XP Potential</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">100</span>
+                    <span class="stat-label">Boss Level</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section dsa-section">
+            <div class="section-header">
+                <span class="section-icon">🏛</span>
+                <h2>Data Structures & Algorithms</h2>
+                <p class="section-subtitle">Forge your foundation in the ancient discipline of computational logic</p>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="quest-grid">
+                <div class="quest-card" data-quest="arrays">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge easy">Beginner</div>
+                        <span class="quest-number">01</span>
+                    </div>
+                    <div class="card-icon">📦</div>
+                    <h3>Arrays & Strings</h3>
+                    <p>Master contiguous memory allocation, sliding windows, and two-pointer techniques.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+500 XP</span>
+                        <span class="reward">🔓 Unlock: Linked Lists</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/arrays-strings.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card" data-quest="linked">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge easy">Beginner</div>
+                        <span class="quest-number">02</span>
+                    </div>
+                    <div class="card-icon">🔗</div>
+                    <h3>Linked Lists</h3>
+                    <p>Navigate pointer-based structures, cycle detection, and merge operations.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+600 XP</span>
+                        <span class="reward">🔓 Unlock: Stacks & Queues</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/linked-lists.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card" data-quest="trees">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge medium">Intermediate</div>
+                        <span class="quest-number">03</span>
+                    </div>
+                    <div class="card-icon">🌳</div>
+                    <h3>Trees & Graphs</h3>
+                    <p>Traverse hierarchical and network structures with DFS, BFS, and advanced algorithms.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+900 XP</span>
+                        <span class="reward">🔓 Unlock: Dynamic Programming</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/trees-graphs.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card" data-quest="dynamic">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge hard">Advanced</div>
+                        <span class="quest-number">04</span>
+                    </div>
+                    <div class="card-icon">⚡</div>
+                    <h3>Dynamic Programming</h3>
+                    <p>Conquer optimization problems with memoization, tabulation, and state machines.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+1200 XP</span>
+                        <span class="reward">🔓 Unlock: Graph Algorithms</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/dynamic-programming.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card" data-quest="sorting">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge medium">Intermediate</div>
+                        <span class="quest-number">05</span>
+                    </div>
+                    <div class="card-icon">🔄</div>
+                    <h3>Sorting & Searching</h3>
+                    <p>Implement QuickSort, MergeSort, binary search variants, and heap operations.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+750 XP</span>
+                        <span class="reward">🔓 Unlock: Hash Tables</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/sorting-searching.html'">Start Quest</button>
+                </div>
+
+                <div class="quest-card" data-quest="hash">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge medium">Intermediate</div>
+                        <span class="quest-number">06</span>
+                    </div>
+                    <div class="card-icon">#️⃣</div>
+                    <h3>Hash Tables</h3>
+                    <p>Engineer collision resolution, bloom filters, and constant-time lookup systems.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+800 XP</span>
+                        <span class="reward">🔓 Unlock: Crypto Hashing</span>
+                    </div>
+                    <button class="quest-btn" onclick="location.href='pages/hash-tables.html'">Begin Quest</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section crypto-section">
+            <div class="section-header">
+                <span class="section-icon">🔐</span>
+                <h2>Cryptographic Architecture</h2>
+                <p class="section-subtitle">Unlock the secrets of digital security and blockchain mastery</p>
+                <div class="section-divider crypto"></div>
+            </div>
+
+            <div class="quest-grid">
+                <div class="quest-card crypto-card" data-quest="hashing">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge easy">Beginner</div>
+                        <span class="quest-number">01</span>
+                    </div>
+                    <div class="card-icon">🔢</div>
+                    <h3>Cryptographic Hashing</h3>
+                    <p>Explore SHA-256, MD5, hash collisions, and one-way function properties.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+700 XP</span>
+                        <span class="reward">🔓 Unlock: Digital Signatures</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/crypto-hashing.html'">Start Quest</button>
+                </div>
+
+                <div class="quest-card crypto-card" data-quest="symmetric">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge medium">Intermediate</div>
+                        <span class="quest-number">02</span>
+                    </div>
+                    <div class="card-icon">🔑</div>
+                    <h3>Symmetric Encryption</h3>
+                    <p>Deploy AES, DES, and block cipher modes for secure data transmission.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+850 XP</span>
+                        <span class="reward">🔓 Unlock: Asymmetric Systems</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/symmetric-encryption.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card crypto-card" data-quest="asymmetric">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge hard">Advanced</div>
+                        <span class="quest-number">03</span>
+                    </div>
+                    <div class="card-icon">🔐</div>
+                    <h3>Asymmetric Encryption</h3>
+                    <p>Master RSA, ECC, key exchange protocols, and public-private key cryptography.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+1100 XP</span>
+                        <span class="reward">🔓 Unlock: Blockchain Core</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/asymmetric-encryption.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card crypto-card" data-quest="signatures">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge medium">Intermediate</div>
+                        <span class="quest-number">04</span>
+                    </div>
+                    <div class="card-icon">✍</div>
+                    <h3>Digital Signatures</h3>
+                    <p>Implement authentication, non-repudiation, and message integrity verification.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+950 XP</span>
+                        <span class="reward">🔓 Unlock: PKI Infrastructure</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/digital-signatures.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card crypto-card" data-quest="blockchain">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge hard">Advanced</div>
+                        <span class="quest-number">05</span>
+                    </div>
+                    <div class="card-icon">⛓</div>
+                    <h3>Blockchain Architecture</h3>
+                    <p>Build distributed ledgers, consensus mechanisms, and smart contract foundations.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+1300 XP</span>
+                        <span class="reward">🔓 Unlock: DeFi Protocols</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/blockchain.html'">Begin Quest</button>
+                </div>
+
+                <div class="quest-card crypto-card" data-quest="zk">
+                    <div class="card-glow crypto-glow"></div>
+                    <div class="card-header">
+                        <div class="difficulty-badge legendary">Legendary</div>
+                        <span class="quest-number">06</span>
+                    </div>
+                    <div class="card-icon">👁</div>
+                    <h3>Zero-Knowledge Proofs</h3>
+                    <p>Achieve privacy-preserving verification with SNARKs, STARKs, and zk-SNARKs.</p>
+                    <div class="quest-rewards">
+                        <span class="reward">+1500 XP</span>
+                        <span class="reward">🏆 Master Cryptographer Title</span>
+                    </div>
+                    <button class="quest-btn crypto-btn" onclick="location.href='pages/zero-knowledge.html'">Begin Quest</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2>Ready to Begin Your Journey?</h2>
+                <p>Choose your path. Forge your skills. Become legendary.</p>
+                <div class="cta-buttons">
+                    <button class="cta-btn primary" onclick="document.querySelector('.dsa-section').scrollIntoView({behavior:'smooth'})">Start DSA Quest Line</button>
+                    <button class="cta-btn secondary" onclick="document.querySelector('.crypto-section').scrollIntoView({behavior:'smooth'})">Start Crypto Quest Line</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="shared/utils.js"></script>
+    <script src="shared/navbar.js"></script>
+    <script src="shared/footer.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

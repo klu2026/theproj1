@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptographic Hashing — Interactive Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030712;
+            --bg-secondary: #0a0f1a;
+            --bg-card: #0d1525;
+            --bg-card-hover: #111d33;
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --cyan-600: #0891b2;
+            --cyan-glow: rgba(6, 182, 212, 0.3);
+            --emerald-400: #34d399;
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+            --emerald-glow: rgba(16, 185, 129, 0.3);
+            --red-400: #f87171;
+            --red-500: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.3);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(6, 182, 212, 0.3);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--cyan-400);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .xp-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--emerald-400);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .progress-track {
+            width: 120px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--cyan-500), var(--emerald-500));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* SECTIONS */
+        section {
+            min-height: 100vh;
+            padding: 6rem 2rem 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--cyan-500);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* HERO */
+        #hero {
+            padding-top: 8rem;
+        }
+
+        .hero-input-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin-bottom: 3rem;
+        }
+
+        .hero-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-accent);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            color: var(--cyan-400);
+            caret-color: var(--emerald-400);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px var(--cyan-glow), inset 0 0 20px rgba(6, 182, 212, 0.03);
+        }
+
+        .hero-input:focus {
+            outline: none;
+            border-color: var(--cyan-400);
+            box-shadow: 0 0 40px var(--cyan-glow), 0 0 80px rgba(6, 182, 212, 0.08), inset 0 0 30px rgba(6, 182, 212, 0.05);
+        }
+
+        .hero-input::placeholder { color: var(--text-muted); }
+
+        .hash-output-section {
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .hash-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .hex-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: 6px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+        }
+
+        .hex-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            cursor: default;
+            position: relative;
+        }
+
+        .hex-cell.active {
+            color: var(--cyan-400);
+            border-color: var(--border-accent);
+        }
+
+        .hex-cell.changed {
+            color: #fff;
+            background: rgba(6, 182, 212, 0.15);
+            border-color: var(--cyan-400);
+            box-shadow: 0 0 12px var(--cyan-glow);
+            animation: cellFlash 0.4s ease;
+        }
+
+        .hex-cell:hover {
+            transform: scale(1.15);
+            z-index: 2;
+        }
+
+        .hex-cell:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-accent);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        @keyframes cellFlash {
+            0% { transform: scaleY(1); }
+            50% { transform: scaleY(0.2); background: var(--cyan-500); }
+            100% { transform: scaleY(1); }
+        }
+
+        .binary-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .binary-cell {
+            width: 12px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+        }
+
+        .binary-cell.one { color: var(--emerald-400); }
+        .binary-cell.zero { color: var(--text-muted); opacity: 0.5; }
+
+        .binary-cell.flip {
+            animation: bitFlip 0.35s ease;
+        }
+
+        @keyframes bitFlip {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.6); color: #fff; }
+            100% { transform: scale(1); }
+        }
+
+        /* AVALANCHE */
+        #avalanche {
+            background: linear-gradient(180deg, transparent 0%, rgba(6, 182, 212, 0.02) 50%, transparent 100%);
+        }
+
+        .avalanche-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .input-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .input-box-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-box-label .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .input-box-label .dot.a { background: var(--cyan-500); }
+        .input-box-label .dot.b { background: var(--emerald-500); }
+
+        .av-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        .av-input:focus {
+            outline: none;
+            border-color: var(--cyan-500);
+        }
+
+        .hash-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .hash-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            line-height: 1.8;
+        }
+
+        .hash-box.hash-a { color: var(--cyan-400); border-color: rgba(6, 182, 212, 0.2); }
+        .hash-box.hash-b { color: var(--emerald-400); border-color: rgba(16, 185, 129, 0.2); }
+
+        .diff-viewer {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .diff-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .diff-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .diff-bit {
+            width: 16px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .diff-bit.match {
+            color: var(--emerald-400);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .diff-bit.diff {
+            color: var(--red-400);
+            background: rgba(239, 68, 68, 0.12);
+            animation: diffPulse 0.5s ease;
+        }
+
+        @keyframes diffPulse {
+            0%, 100% { box-shadow: none; }
+            50% { box-shadow: 0 0 8px var(--red-glow); }
+        }
+
+        .diff-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .diff-legend span { display: flex; align-items: center; gap: 0.4rem; }
+        .diff-legend .swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .avalanche-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--cyan-400);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .avalanche-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+
+        .avalanche-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan-500), var(--emerald-500));
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* PIPELINE */
+        #pipeline {
+            min-height: 100vh;
+            padding-bottom: 6rem;
+        }
+
+        .pipeline-container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .pipeline-stages {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stage-node {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 130px;
+            transition: all 0.4s ease;
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .stage-node.active {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--cyan-500);
+            box-shadow: 0 0 25px var(--cyan-glow);
+        }
+
+        .stage-node.complete {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--emerald-500);
+            box-shadow: 0 0 20px var(--emerald-glow);
+        }
+
+        .stage-node.complete::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            background: var(--emerald-500);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .stage-node { position: relative; }
+
+        .stage-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .stage-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .pipeline-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pipe-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.7rem 1.4rem;
+            border: 1px solid var(--border-accent);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pipe-btn:hover {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--cyan-400);
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        .pipe-btn.primary {
+            background: linear-gradient(135deg, var(--cyan-600), var(--cyan-500));
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .pipe-btn.primary:hover {
+            box-shadow: 0 0 25px var(--cyan-glow);
+            transform: translateY(-1px);
+        }
+
+        .pipe-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .state-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .state-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .state-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .state-item.highlight {
+            border-color: var(--cyan-400);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .state-item .reg-name {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .state-item .reg-value {
+            color: var(--cyan-400);
+            font-weight: 500;
+        }
+
+        .pipeline-viz {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .viz-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 500px;
+            margin-bottom: 1rem;
+        }
+
+        .viz-detail {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--cyan-400);
+            background: var(--bg-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* INFO CARDS */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 3rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-4px);
+        }
+
+        .info-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .info-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .info-card strong { color: var(--cyan-400); }
+
+        .info-stat {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--emerald-400);
+        }
+
+        /* FOOTER */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hex-grid { grid-template-columns: repeat(8, 1fr); }
+            .input-pair, .hash-pair { grid-template-columns: 1fr; }
+            .avalanche-stats { grid-template-columns: 1fr; }
+            .section-title { font-size: 1.8rem; }
+            .hero-input { font-size: 1.2rem; padding: 1.2rem 1.5rem; }
+            .pipeline-stages { gap: 0.5rem; }
+            .stage-node { min-width: 90px; padding: 0.8rem 0.8rem; }
+            .stage-name { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="content-wrapper">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-brand"><a href="index.html" style="color: inherit; text-decoration: none;">← Quest Hub</a> / 🔐 Crypto Hashing</div>
+        <div class="nav-progress">
+            <div class="xp-badge" id="xp-display">+0 XP</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="main-progress"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECTION 1: HERO VISUALIZER -->
+    <section id="hero">
+        <div class="section-label">Module 01</div>
+        <h1 class="section-title">The Cryptic Visualizer</h1>
+        <p class="section-subtitle">Type anything and watch SHA-256 transform your words into a 256-bit cryptographic fingerprint in real time.</p>
+
+        <div class="hero-input-wrapper">
+            <input type="text" class="hero-input" id="hash-input" placeholder="Type something..." autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="hash-output-section">
+            <div class="hash-label">SHA-256 Hex Digest</div>
+            <div class="hex-grid" id="hex-grid"></div>
+
+            <div class="hash-label">Binary Representation</div>
+            <div class="binary-grid" id="binary-grid"></div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: AVALANCHE EFFECT -->
+    <section id="avalanche">
+        <div class="section-label">Module 02</div>
+        <h1 class="section-title">Avalanche Effect Playground</h1>
+        <p class="section-subtitle">Change one character. Watch the entire hash scramble. This is what makes cryptographic hashing secure.</p>
+
+        <div class="avalanche-container">
+            <div class="input-pair">
+                <div class="input-box">
+                    <div class="input-box-label"><span class="dot a"></span> Input A</div>
+                    <input type="text" class="av-input" id="av-input-a" value="attack at dawn" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="input-box">
+                    <div class="input-box-label"><span class="dot b"></span> Input B (1 char changed)</div>
+                    <input type="text" class="av-input" id="av-input-b" value="attack at daW" autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+
+            <div class="hash-pair">
+                <div class="hash-box hash-a" id="hash-a">—</div>
+                <div class="hash-box hash-b" id="hash-b">—</div>
+            </div>
+
+            <div class="diff-viewer">
+                <div class="diff-title">Bit-Level Diff Comparison</div>
+                <div class="diff-row" id="diff-row-a"></div>
+                <div class="diff-row" id="diff-row-b"></div>
+                <div class="diff-legend">
+                    <span><span class="swatch" style="background: var(--emerald-400);"></span> Same</span>
+                    <span><span class="swatch" style="background: var(--red-400);"></span> Flipped</span>
+                </div>
+            </div>
+
+            <div class="avalanche-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="bits-changed">0</div>
+                    <div class="stat-label">Bits Changed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bits-total">256</div>
+                    <div class="stat-label">Total Bits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avalanche-pct">0%</div>
+                    <div class="stat-label">Avalanche</div>
+                </div>
+            </div>
+            <div class="avalanche-bar">
+                <div class="avalanche-bar-fill" id="av-bar-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: SHA-256 PIPELINE -->
+    <section id="pipeline">
+        <div class="section-label">Module 03</div>
+        <h1 class="section-title">SHA-256 Pipeline</h1>
+        <p class="section-subtitle">Step through each stage of the SHA-256 algorithm. Watch padding, scheduling, and compression unfold.</p>
+
+        <div class="pipeline-container">
+            <div class="pipeline-stages" id="pipeline-stages">
+                <div class="stage-node active" data-stage="0">
+                    <div class="stage-num">Stage 1</div>
+                    <div class="stage-name">Input</div>
+                </div>
+                <div class="stage-node" data-stage="1">
+                    <div class="stage-num">Stage 2</div>
+                    <div class="stage-name">Padding</div>
+                </div>
+                <div class="stage-node" data-stage="2">
+                    <div class="stage-num">Stage 3</div>
+                    <div class="stage-name">Schedule</div>
+                </div>
+                <div class="stage-node" data-stage="3">
+                    <div class="stage-num">Stage 4</div>
+                    <div class="stage-name">Init Hash</div>
+                </div>
+                <div class="stage-node" data-stage="4">
+                    <div class="stage-num">Stage 5</div>
+                    <div class="stage-name">64 Rounds</div>
+                </div>
+                <div class="stage-node" data-stage="5">
+                    <div class="stage-num">Stage 6</div>
+                    <div class="stage-name">Final Hash</div>
+                </div>
+            </div>
+
+            <div class="pipeline-controls">
+                <button class="pipe-btn" id="btn-prev" disabled>◀ Prev</button>
+                <button class="pipe-btn primary" id="btn-play">▶ Play</button>
+                <button class="pipe-btn" id="btn-pause" disabled>⏸ Pause</button>
+                <button class="pipe-btn" id="btn-next">Next ▶</button>
+                <button class="pipe-btn" id="btn-reset">⟲ Reset</button>
+            </div>
+
+            <div class="state-panel" id="state-panel">
+                <div class="state-title">Current State — <span id="state-stage-name">Input Message</span></div>
+                <div class="state-grid" id="state-grid"></div>
+            </div>
+
+            <div class="pipeline-viz" id="pipeline-viz">
+                <div class="viz-description" id="viz-desc">
+                    Enter a message in the Hero section above, then press <strong>Play</strong> or <strong>Next</strong> to step through SHA-256.
+                </div>
+                <div class="viz-detail" id="viz-detail">Waiting for input...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO CARDS -->
+    <section style="min-height: auto; padding: 2rem 2rem 4rem;">
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-icon">💡</div>
+                <h4>Avalanche Effect</h4>
+                <p>A secure hash must flip ~<strong>50% of output bits</strong> for every 1-bit input change. This prevents attackers from predicting output patterns.</p>
+                <div class="info-stat">≈50%</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">🛡</div>
+                <h4>Collision Resistance</h4>
+                <p>Finding two inputs with the same SHA-256 hash requires ~<strong>2^128 operations</strong>. At 1 trillion/sec, that's longer than the universe's age.</p>
+                <div class="info-stat">2^128</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">🔒</div>
+                <h4>Preimage Resistance</h4>
+                <p>Given a hash output, it's computationally infeasible to find the original input. This one-way property is fundamental to digital signatures.</p>
+                <div class="info-stat">One-Way</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Forged in the fires of computational excellence — Quest Hub</p>
+    </footer>
+</div>
+
+<script>
+// ========== AUDIO ==========
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function ensureAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+}
+
+function playHashSound() {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playBitSound() {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(180 + Math.random() * 80, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.04);
+}
+
+// ========== PARTICLES ==========
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let mouseX = -1000, mouseY = -1000;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.size = Math.random() * 2 + 0.5;
+        this.alpha = Math.random() * 0.4 + 0.1;
+        this.color = Math.random() > 0.5 ? '6, 182, 212' : '16, 185, 129';
+    }
+    update() {
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+            const force = (150 - dist) / 150;
+            this.vx += (dx / dist) * force * 0.8;
+            this.vy += (dy / dist) * force * 0.8;
+        }
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+        ctx.fill();
+    }
+}
+
+for (let i = 0; i < 180; i++) particles.push(new Particle());
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ========== HASHING ==========
+async function computeHash(msg) {
+    const data = new TextEncoder().encode(msg);
+    const hashBuf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToBinary(hex) {
+    return hex.split('').map(c => parseInt(c, 16).toString(2).padStart(4, '0')).join('');
+}
+
+// ========== HERO VISUALIZER ==========
+const hexGrid = document.getElementById('hex-grid');
+const binaryGrid = document.getElementById('binary-grid');
+const hashInput = document.getElementById('hash-input');
+let prevHex = '';
+
+function initHexGrid() {
+    hexGrid.innerHTML = '';
+    for (let i = 0; i < 64; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'hex-cell';
+        cell.textContent = '—';
+        cell.dataset.tooltip = `Byte ${i}`;
+        hexGrid.appendChild(cell);
+    }
+}
+
+function initBinaryGrid() {
+    binaryGrid.innerHTML = '';
+    for (let i = 0; i < 256; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'binary-cell';
+        cell.textContent = '0';
+        binaryGrid.appendChild(cell);
+    }
+}
+
+initHexGrid();
+initBinaryGrid();
+
+let hashDebounce;
+hashInput.addEventListener('input', () => {
+    clearTimeout(hashDebounce);
+    hashDebounce = setTimeout(() => updateHeroHash(), 50);
+});
+
+async function updateHeroHash() {
+    const msg = hashInput.value;
+    if (!msg) {
+        document.querySelectorAll('.hex-cell').forEach(c => { c.textContent = '—'; c.classList.remove('active', 'changed'); });
+        document.querySelectorAll('.binary-cell').forEach(c => { c.textContent = '0'; c.className = 'binary-cell'; });
+        prevHex = '';
+        return;
+    }
+    const hex = await computeHash(msg);
+    const cells = document.querySelectorAll('.hex-cell');
+    const bins = document.querySelectorAll('.binary-cell');
+
+    let changed = false;
+    hex.split('').forEach((ch, i) => {
+        const old = prevHex[i] || '';
+        cells[i].textContent = ch;
+        cells[i].classList.add('active');
+        if (old && old !== ch) {
+            cells[i].classList.add('changed');
+            setTimeout(() => cells[i].classList.remove('changed'), 500);
+            changed = true;
+        }
+    });
+
+    const bin = hexToBinary(hex);
+    bin.split('').forEach((bit, i) => {
+        const oldBin = prevHex ? hexToBinary(prevHex)[i] : '';
+        bins[i].textContent = bit;
+        bins[i].className = `binary-cell ${bit === '1' ? 'one' : 'zero'}`;
+        if (oldBin && oldBin !== bit) {
+            bins[i].classList.add('flip');
+            setTimeout(() => bins[i].classList.remove('flip'), 400);
+        }
+    });
+
+    if (changed) playHashSound();
+    prevHex = hex;
+    updateProgress(33);
+}
+
+// ========== AVALANCHE ==========
+const avInputA = document.getElementById('av-input-a');
+const avInputB = document.getElementById('av-input-b');
+const hashADiv = document.getElementById('hash-a');
+const hashBDiv = document.getElementById('hash-b');
+const diffRowA = document.getElementById('diff-row-a');
+const diffRowB = document.getElementById('diff-row-b');
+const bitsChangedEl = document.getElementById('bits-changed');
+const avalanchePctEl = document.getElementById('avalanche-pct');
+const avBarFill = document.getElementById('av-bar-fill');
+
+let prevAvHex = { a: '', b: '' };
+
+async function updateAvalanche() {
+    const [hexA, hexB] = await Promise.all([computeHash(avInputA.value), computeHash(avInputB.value)]);
+    hashADiv.textContent = hexA.match(/.{1,2}/g).join(' ');
+    hashBDiv.textContent = hexB.match(/.{1,2}/g).join(' ');
+
+    const binA = hexToBinary(hexA);
+    const binB = hexToBinary(hexB);
+
+    diffRowA.innerHTML = '';
+    diffRowB.innerHTML = '';
+    let diffs = 0;
+
+    for (let i = 0; i < 256; i++) {
+        const a = binA[i];
+        const b = binB[i];
+        const isDiff = a !== b;
+        if (isDiff) diffs++;
+
+        const elA = document.createElement('div');
+        elA.className = `diff-bit ${isDiff ? 'diff' : 'match'}`;
+        elA.textContent = a;
+        diffRowA.appendChild(elA);
+
+        const elB = document.createElement('div');
+        elB.className = `diff-bit ${isDiff ? 'diff' : 'match'}`;
+        elB.textContent = b;
+        diffRowB.appendChild(elB);
+    }
+
+    const pct = ((diffs / 256) * 100).toFixed(1);
+    bitsChangedEl.textContent = diffs;
+    avalanchePctEl.textContent = pct + '%';
+    avBarFill.style.width = pct + '%';
+
+    if (prevAvHex.a && (prevAvHex.a !== hexA || prevAvHex.b !== hexB)) playBitSound();
+    prevAvHex = { a: hexA, b: hexB };
+    updateProgress(66);
+}
+
+avInputA.addEventListener('input', updateAvalanche);
+avInputB.addEventListener('input', updateAvalanche);
+updateAvalanche();
+
+// ========== PIPELINE ==========
+const SHA256_K = [
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+];
+
+const SHA256_H0 = [
+    0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
+    0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+];
+
+const stageNames = ['Input Message', 'Padding', 'Message Schedule', 'Initialize Hash Variables', '64 Compression Rounds', 'Final Hash Digest'];
+
+let currentStage = 0;
+let pipelineRunning = false;
+let pipelineTimer = null;
+let pipelineData = null;
+
+function rightRotate(v, n) { return (v >>> n) | (v << (32 - n)); }
+function rightShift(v, n) { return v >>> n; }
+
+function toHex32(v) { return (v >>> 0).toString(16).padStart(8, '0'); }
+
+function padMessage(msg) {
+    const bytes = new TextEncoder().encode(msg);
+    const bitLen = bytes.length * 8;
+    const padLen = (56 - (bytes.length + 1) % 64 + 64) % 64;
+    const padded = new Uint8Array(bytes.length + 1 + padLen + 8);
+    padded.set(bytes);
+    padded[bytes.length] = 0x80;
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 4, bitLen, false);
+    return padded;
+}
+
+function buildSchedule(padded) {
+    const blocks = [];
+    for (let i = 0; i < padded.length; i += 64) {
+        const block = [];
+        for (let j = 0; j < 16; j++) {
+            block.push((padded[i + j * 4] << 24) | (padded[i + j * 4 + 1] << 16) | (padded[i + j * 4 + 2] << 8) | padded[i + j * 4 + 3]);
+        }
+        for (let j = 16; j < 64; j++) {
+            const s0 = rightRotate(block[j-15], 7) ^ rightRotate(block[j-15], 18) ^ rightShift(block[j-15], 3);
+            const s1 = rightRotate(block[j-2], 17) ^ rightRotate(block[j-2], 19) ^ rightShift(block[j-2], 10);
+            block.push(((block[j-16] + s0 + block[j-7] + s1) | 0) >>> 0);
+        }
+        blocks.push(block);
+    }
+    return blocks;
+}
+
+function sha256Full(msg) {
+    const padded = padMessage(msg);
+    const blocks = buildSchedule(padded);
+    let h = SHA256_H0.slice();
+
+    for (const block of blocks) {
+        let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], hh = h[7];
+
+        for (let i = 0; i < 64; i++) {
+            const S1 = rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25);
+            const ch = (e & f) ^ (~e & g);
+            const t1 = (hh + S1 + ch + SHA256_K[i] + block[i]) | 0;
+            const S0 = rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22);
+            const maj = (a & b) ^ (a & c) ^ (b & c);
+            const t2 = (S0 + maj) | 0;
+
+            hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+        }
+
+        h[0] = (h[0] + a) | 0;
+        h[1] = (h[1] + b) | 0;
+        h[2] = (h[2] + c) | 0;
+        h[3] = (h[3] + d) | 0;
+        h[4] = (h[4] + e) | 0;
+        h[5] = (h[5] + f) | 0;
+        h[6] = (h[6] + g) | 0;
+        h[7] = (h[7] + hh) | 0;
+    }
+
+    return h.map(v => (v >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
+function preparePipeline() {
+    const msg = hashInput.value || 'hello';
+    const padded = padMessage(msg);
+    const blocks = buildSchedule(padded);
+    pipelineData = { msg, padded, blocks, currentRound: 0, h: SHA256_H0.slice() };
+}
+
+function updateStageNodes() {
+    document.querySelectorAll('.stage-node').forEach((node, i) => {
+        node.classList.remove('active', 'complete');
+        if (i < currentStage) node.classList.add('complete');
+        if (i === currentStage) node.classList.add('active');
+    });
+    document.getElementById('state-stage-name').textContent = stageNames[currentStage];
+}
+
+function renderState() {
+    const grid = document.getElementById('state-grid');
+    grid.innerHTML = '';
+    if (!pipelineData) return;
+
+    if (currentStage === 0) {
+        addStateItem(grid, 'Message', pipelineData.msg.substring(0, 20) + (pipelineData.msg.length > 20 ? '...' : ''));
+        addStateItem(grid, 'Bytes', pipelineData.padded.length);
+        addStateItem(grid, 'Bits', pipelineData.padded.length * 8);
+    } else if (currentStage === 1) {
+        const lastBytes = Array.from(padded).slice(-8);
+        addStateItem(grid, 'Padding', '10000000...', true);
+        addStateItem(grid, 'Zeroes', Math.max(0, 56 - (pipelineData.msg.length + 1) % 64), false, true);
+        addStateItem(grid, 'Bit Length', pipelineData.msg.length * 8);
+        addStateItem(grid, 'Total Blocks', pipelineData.blocks.length);
+    } else if (currentStage === 2) {
+        const block = pipelineData.blocks[0] || [];
+        for (let i = 0; i < Math.min(16, block.length); i++) {
+            addStateItem(grid, `W${i}`, '0x' + toHex32(block[i]), i === 0);
+        }
+    } else if (currentStage === 3) {
+        SHA256_H0.forEach((v, i) => {
+            addStateItem(grid, `H${i}`, '0x' + toHex32(v), true);
+        });
+    } else if (currentStage === 4) {
+        addStateItem(grid, 'Round', `${pipelineData.currentRound} / 64`, true);
+        addStateItem(grid, 'K[r]', '0x' + toHex32(SHA256_K[pipelineData.currentRound] || 0));
+        const block = pipelineData.blocks[0] || [];
+        addStateItem(grid, 'W[r]', '0x' + toHex32(block[pipelineData.currentRound] || 0));
+        ['a','b','c','d','e','f','g','h'].forEach((r, i) => {
+            addStateItem(grid, r, '0x' + toHex32(pipelineData.h[i] || 0));
+        });
+    } else if (currentStage === 5) {
+        const finalHash = sha256Full(pipelineData.msg);
+        for (let i = 0; i < 8; i++) {
+            addStateItem(grid, `H${i}`, '0x' + finalHash.substring(i * 8, i * 8 + 8), true);
+        }
+        addStateItem(grid, 'Final', finalHash.substring(0, 16) + '...');
+    }
+}
+
+function addStateItem(container, name, value, highlight = false, isCalc = false) {
+    const item = document.createElement('div');
+    item.className = 'state-item' + (highlight ? ' highlight' : '');
+    item.innerHTML = `<span class="reg-name">${name}</span><span class="reg-value">${value}</span>`;
+    container.appendChild(item);
+}
+
+let padded;
+
+function renderViz() {
+    const desc = document.getElementById('viz-desc');
+    const detail = document.getElementById('viz-detail');
+
+    const descs = [
+        `Your message "<strong>${(pipelineData?.msg || '').substring(0, 30)}</strong>" is ready to be hashed.`,
+        `Appending a <strong>1-bit</strong>, then <strong>zeroes</strong> until the length is ≡ 448 mod 512, followed by a <strong>64-bit length</strong> field.`,
+        `Expanding 16 words into <strong>64 words</strong> using σ₀ and σ₁ bitwise functions: W<sub>t</sub> = σ₁(W<sub>t-2</sub>) + W<sub>t-7</sub> + σ₀(W<sub>t-15</sub>) + W<sub>t-16</sub>`,
+        `Loading the eight <strong>initial hash values</strong> (H₀–H₇) derived from the fractional parts of the square roots of the first 8 primes.`,
+        `Running <strong>64 rounds</strong> of compression. Each round applies Σ₀, Ch, Σ₁, Maj, and modular addition to update registers a–h.`,
+        `<strong>Hash complete!</strong> The final 256-bit digest is the concatenation of H₀ through H₇.`
+    ];
+
+    const details = [
+        `Input: ${(pipelineData?.msg || '—').substring(0, 40)}`,
+        `Padded length: ${pipelineData?.padded?.length || 0} bytes (${(pipelineData?.padded?.length || 0) * 8} bits)`,
+        `W₀..W₁₅ → W₁₆..W₆₃  |  64 words × 32 bits = 2048 bits per block`,
+        `H₀=0x6a09e667  H₁=0xbb67ae85  H₂=0x3c6ef372  H₃=0xa54ff53a`,
+        `Round ${pipelineData?.currentRound || 0}/64  |  Σ₀(a) + Ch(a,b,c) + K[r] + W[r] + h  →  t₁`,
+        `Digest: ${sha256Full(pipelineData?.msg || 'hello')}`
+    ];
+
+    desc.innerHTML = descs[currentStage] || '';
+    detail.innerHTML = details[currentStage] || '';
+}
+
+function goToStage(stage) {
+    currentStage = Math.max(0, Math.min(5, stage));
+    updateStageNodes();
+    renderState();
+    renderViz();
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+    if (!pipelineData) preparePipeline();
+    if (currentStage < 5) {
+        goToStage(currentStage + 1);
+        if (currentStage === 5) updateProgress(100);
+    }
+});
+
+document.getElementById('btn-prev').addEventListener('click', () => {
+    if (currentStage > 0) goToStage(currentStage - 1);
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    pipelineRunning = false;
+    clearTimeout(pipelineTimer);
+    document.getElementById('btn-play').textContent = '▶ Play';
+    document.getElementById('btn-pause').disabled = true;
+    document.getElementById('btn-next').disabled = false;
+    preparePipeline();
+    goToStage(0);
+});
+
+document.getElementById('btn-play').addEventListener('click', () => {
+    ensureAudio();
+    if (!pipelineData) preparePipeline();
+    pipelineRunning = true;
+    document.getElementById('btn-play').textContent = '▶ Playing...';
+    document.getElementById('btn-pause').disabled = false;
+    document.getElementById('btn-next').disabled = true;
+    playPipelineStep();
+});
+
+document.getElementById('btn-pause').addEventListener('click', () => {
+    pipelineRunning = false;
+    clearTimeout(pipelineTimer);
+    document.getElementById('btn-play').textContent = '▶ Resume';
+    document.getElementById('btn-pause').disabled = true;
+    document.getElementById('btn-next').disabled = false;
+});
+
+function playPipelineStep() {
+    if (!pipelineRunning) return;
+    if (currentStage < 5) {
+        goToStage(currentStage + 1);
+        if (currentStage === 5) {
+            pipelineRunning = false;
+            document.getElementById('btn-play').textContent = '▶ Play';
+            document.getElementById('btn-pause').disabled = true;
+            document.getElementById('btn-next').disabled = false;
+            updateProgress(100);
+            playHashSound();
+            return;
+        }
+        pipelineTimer = setTimeout(playPipelineStep, currentStage === 4 ? 60 : 800);
+    }
+}
+
+// ========== PROGRESS ==========
+let progress = 0;
+function updateProgress(val) {
+    if (val > progress) {
+        progress = val;
+        document.getElementById('main-progress').style.width = val + '%';
+        if (val >= 100) {
+            document.getElementById('xp-display').textContent = '+1500 XP';
+            document.getElementById('xp-display').style.color = '#fbbf24';
+        }
+    }
+}
+
+// ========== INIT ==========
+preparePipeline();
+goToStage(0);
+</script>
+</body>
+</html>
